@@ -1,0 +1,61 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Logs
+logs
+*.log
+logs/**/*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+out/
+
+# Dependency directories
+jspm_packages/
+.vscode/
+.idea/
+.sass-cache/
+.cache/
+
+# Testing output
+coverage/
+*.lcov
+
+# Optional npm cache
+.npm/
+
+# IDEs and editors
+*.swp
+*.swo
+*.swn
+*.swo
+*.orig
+.vscode/
+.idea/
+.vscode/*
+
+# System files
+.Trashes
+.DS_Store
+*.tmp
+
+# Package files
+*.tgz
+*.tar.gz
+
+# CI/CD
+.cache/
