@@ -1,50 +1,87 @@
-import express from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import User from '../models/Roles/User.js';
-import dotenv from 'dotenv';
+// routes/auth.js
 
-dotenv.config();
+import express from "express";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+
 const router = express.Router();
-const saltRounds = 10;
 
-// Register a new user
-router.post('/register', async (req, res) => {
-    try {
-        const { username, password, role } = req.body;
+// User registration route
+router.post("/register", async (req, res) => {
+  try {
+    const { username, password, role } = req.body;
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        // Create the new user
-        const user = await User.create({  
-            username, 
-            password: hashedPassword, 
-            role 
-        });
-
-        res.status(201).json({ message: 'User registered successfully', user: { username: user.username, role: user.role } });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    // Validate input
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ error: "Username and password are required." });
     }
-});
 
-// Login user and return a JWT
-router.post('/login', async (req, res) => {
+    // Check if user already exists
+    const existingUser = await User.findOne({ where: { username } });
+    if (existingUser) {
+      return res.status(400).json({ error: "Username already exists." });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create the user (without assigning to a variable if not needed)
+    await User.create({
+      username,
+      password: hashedPassword,
+      role: role || "user", // Default role is 'user' if not provided
+    });
+
+    res.status(201).json({ message: "User registered successfully." });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ error: "An error occurred during registration." });
+  }
+});
+// User login route
+router.post("/login", async (req, res) => {
+  console.log("Login route reached"); // To confirm route is accessed
+
+  try {
     const { username, password } = req.body;
 
-    try {
-        const user = await User.findOne({ where: { username } });
-
-        if (user && await bcrypt.compare(password, user.password)) {
-            const token = jwt.sign({ userId: user.UserID, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.json({ message: 'Login successful', token });
-        } else {
-            res.status(401).json({ error: 'Invalid credentials' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required." });
     }
+
+    const user = await User.findOne({ where: { username } });
+
+    if (!user) {
+      return res.status(400).json({ error: "Invalid credentials." });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword) {
+      return res.status(400).json({ error: "Invalid credentials." });
+    }
+
+    // Log environment secret for debugging
+    console.log('JWT_SECRET:', process.env.JWT_SECRET);
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      process.env.JWT_SECRET, // Check here if undefined or empty
+      { expiresIn: "1h" }
+    );
+
+    // Log the generated token (or decoded parts if concerned about exposure)
+    console.log("Generated Token:", token);
+
+    res.json({ token });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "An error occurred during login." });
+  }
 });
+
 
 export default router;

@@ -1,54 +1,22 @@
-import express from 'express';
-import Book from '../models/Book.js';
-import { authenticateJWT, authorizeRole } from '../middleware/auth.js';
+// middleware/auth.js
 
-const router = express.Router();
+import jwt from 'jsonwebtoken';
 
-// create a new book (admin only)
-router.post('/', authenticateJWT, authorizeRole('admin'), async (req, res) => {
-    try {
-        const book = await Book.create(req.body);
-        res.status(201).json(book);
+const authenticateJWT = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied. Token missing.' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid token' });
     }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
+    req.user = user; // Store user info in request
+    next();
+  });
+};
 
-// Get all books (public)
-router.get('/', async (req, res) => {
-    try {
-        const books = await Book.findAll();
-        res.json(books);
-    }
-    catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-
-// Update a book (admin only)
-router.put('/:id', authenticateJWT, authorizeRole('admin'), async (req, res) => {
-    try {
-        await Book.update(req.body, { where: { id: req.params.id } });
-        res.json({ message: 'Book updated successfully' });
-        
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-
-// Delete a book (admin only)
-router.delete('/:id', authenticateJWT, authorizeRole('admin'), async (req, res) => {
-    try {
-        await Book.destroy({ where: { id: req.params.id } });
-        res.json({ message: 'Book deleted successfully' });
-        res.status(204).send();
-    }
-    catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-export default router;
+export default authenticateJWT;

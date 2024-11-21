@@ -1,0 +1,64 @@
+# Dependency directories
+node_modules/
+bower_components/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Production build
+dist/
+build/
+
+# Static build cache
+.cache/
+.next/
+.nuxt/
+.svelte-kit/
+.vite/
+
+# Testing
+coverage/
+*.lcov
+.vitest/
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# MacOS files
+.DS_Store
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Parcel cache
+.cache/
+.parcel-cache/
+
+# Output of `npm pack`
+*.tgz
+
+# Optional eslint cache
+.eslintcache
+
+# VSCode settings folder
+.vscode/
+
+# Other
+!.gitignore

@@ -1,7 +1,7 @@
-import express from 'express';
 import dotenv from 'dotenv';
+import express from 'express';
 import sequelize from './config/database.js';
-
+import cors from 'cors';
 import authRouter from './routes/authRouter.js';
 import booksRouter from './routes/books.js';
 import authorsRouter from './routes/authors.js';
@@ -19,6 +19,12 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
+
+app.use(cors({
+  origin: 'http://localhost:3000', // Update this with your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 
 // Mount API routes under /api
 app.use('/api/auth', authRouter);

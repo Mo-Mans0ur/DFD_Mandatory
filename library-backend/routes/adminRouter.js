@@ -1,6 +1,6 @@
 // routes/adminRouter.js
 import express from 'express';
-import authenticateToken from '../middleware/authenticateToken.js';
+import authenticateToken from '../middleware/authentificationToken.js';
 import authorizeRole from '../middleware/authorizeRole.js';
 
 const router = express.Router();
